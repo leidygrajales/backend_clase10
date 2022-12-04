@@ -3,18 +3,17 @@ const path = require("path")
 const router_productos = require('./routes/router.productos')
 const multer = require('multer');
 const upload = multer();
-const { Server: HttpServer } = require('http')
-const { Server: IO } = require('socket.io')
+const { Server: HttpServer } = require('http');
+const { Server: IOServer } = require("socket.io");
 
 const app = express()
-const httpServer = new HttpServer(app)
-const io = new IO(httpServer)
+const httpServer = new HttpServer(app);
+const io = new IOServer(httpServer);
 
 const PORT = 8080
 
 const Container = require('./container/container.js')
 const archivo = new Container('./src/productos.json')
-
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -22,10 +21,12 @@ app.use(express.urlencoded({ extended: true }))
 app.use(upload.array());
 
 app.use('/api/productos', router_productos)
-app.use(express.static(`${__dirname}/public`))
+app.use('/socket.io', express.static(path.join(__dirname, '../node_modules/socket.io/client-dist')))
+app.use(express.static(path.join(__dirname, '../public')))
 
 app.set("views", path.join(__dirname, "../public/views"))
 app.set('view engine', 'pug')
+
 
 app.get('/', (req, res) => {
     res.render('index')
@@ -38,15 +39,10 @@ app.get('/products', async (req, res) => {
     res.render('products', { empty, products })
 })
 
-const messages = [
-    { author: 'pablo', text: 'hola, que tal?' },
-    { author: 'marcelo', text: 'muy bien y vos' },
-    { author: 'belen', text: 'hola!!' }
-]
+const messages = []
 
 //conf de socket 
 io.on('connection', socket => {
-    console.log('nuevo cliente conectado');
 
     //historial del chat cuando el nuevo cliente se conecte 
     socket.emit('message', messages)
@@ -61,4 +57,4 @@ io.on('connection', socket => {
     })
 })
 
-app.listen(PORT, () => console.log(`servidor corriendo en el puerto ${PORT}`))
+httpServer.listen(PORT, () => console.log(`servidor corriendo en el puerto ${PORT}`))
