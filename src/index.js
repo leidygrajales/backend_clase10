@@ -48,14 +48,14 @@ io.on('connection', socket => {
     messages.push(data)
 
     //re enviamos por medio de broadcast los msn a todos los clientrs que esten conectados
-    socket.emit('messages', messages)
+    io.sockets.emit('messages', messages)
   })
 
   socket.on('new-product', data => {
     archivo.save(data).then(_ => {
       archivo.getAll().then(products => {
         //re enviamos por medio de broadcast los products a todos los clientrs que esten conectados
-        socket.emit('products', products)
+        io.sockets.emit('products', products)
       })
     })
   })
