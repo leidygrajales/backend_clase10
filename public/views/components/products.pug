@@ -1,0 +1,26 @@
+
+div(class="d-flex flex-grow-1 flex-column bg-light p-3 rounded border")
+  h3(class="text-center text-primary")="PRODUCTS"
+  form(onsubmit="return addProduct(this)" class="row align-items-center gy-3 mt-0")
+    div(class="input-group")
+      div(class="form-floating col-auto")
+        input(type="text" class="form-control" id="title" placeholder="Title" name="title")
+        label="Title" 
+      div(class="form-floating col-auto")
+        input(type="text" class="form-control" id="price" placeholder="Price" name="price")
+        label="Price" 
+    div(class="input-group")
+      div(class="form-floating")
+        input(type="text" class="form-control" id="thumbnail" placeholder="Picture URL" name="thumbnail")
+        label="Thumbnail"
+    div(class="input-group")
+      button(type="submit" class="btn btn-primary")="SEND"
+  hr
+  table(class="table table-default table-striped table-bordered mt-2 align-middle text-center ")
+    thead
+      tr(class="text-primary table-secondary")
+        th(scope="col")="ID"
+        th(scope="col")="Product"
+        th(scope="col")="Price"
+        th(scope="col")="Thumbnail"
+    tbody(id="product-list")

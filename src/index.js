@@ -27,34 +27,38 @@ app.use(express.static(path.join(__dirname, '../public')))
 app.set("views", path.join(__dirname, "../public/views"))
 app.set('view engine', 'pug')
 
-
-app.get('/', (req, res) => {
-    res.render('index')
+app.get('/', async (req, res) => {
+  res.render('index')
 })
-
-app.get('/products', async (req, res) => {
-    const products = await archivo.getAll()
-    const empty = products.length === 0
-
-    res.render('products', { empty, products })
-})
-
-const messages = []
 
 //conf de socket 
+const messages = []
+
 io.on('connection', socket => {
 
-    //historial del chat cuando el nuevo cliente se conecte 
-    socket.emit('message', messages)
+  //historial del chat cuando el nuevo cliente se conecte 
+  socket.emit('messages', messages)
 
-    //escuchamos al cliente
-    socket.on('new-message', data => {
-        messages.push(data)
+  archivo.getAll().then(products => {
+    socket.emit('products', products)
+  })
 
-        //re enviamos por medio de broadcast los msn a todos los clientrs que esten conectados
-        io.sockets.emit('message', messages)
+  //escuchamos al cliente
+  socket.on('new-message', data => {
+    messages.push(data)
 
+    //re enviamos por medio de broadcast los msn a todos los clientrs que esten conectados
+    socket.emit('messages', messages)
+  })
+
+  socket.on('new-product', data => {
+    archivo.save(data).then(_ => {
+      archivo.getAll().then(products => {
+        //re enviamos por medio de broadcast los products a todos los clientrs que esten conectados
+        socket.emit('products', products)
+      })
     })
+  })
 })
 
 httpServer.listen(PORT, () => console.log(`servidor corriendo en el puerto ${PORT}`))

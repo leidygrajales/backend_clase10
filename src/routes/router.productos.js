@@ -24,7 +24,7 @@ router.get('/:id', async (req, res) => {
 router.post('', async (req, res) => {
   try {
     const result = await archivo.save(req.body)
-    return res.status(200).redirect('/products')
+    return res.status(200).redirect('/')
   } catch (error) {
     return res.status(500).json({ error: 'Error al insertar el registro' })
   }
